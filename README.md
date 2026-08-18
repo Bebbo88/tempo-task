@@ -31,6 +31,22 @@ src/
 └── shared/               # Reusable UI components, utilities, and client configs
 ```
 
+## Choice of Next.js Router: App Router
+
+The App Router (`/app`) was chosen for several architectural advantages:
+
+- React Server Components (RSC): Allows data prefetching on the server to keep heavy logic off the client bundle.
+- Built-in Layouts and Error Boundaries: Native collocated support for `loading.tsx`, `error.tsx`, and `not-found.tsx`.
+- Hybrid Rendering: Server-side rendering for search and filtering alongside static generation capabilities for detail routes.
+
+## Scope & Trade-offs
+
+To keep the application focused, clean, and avoid over-engineering:
+
+- Manual vs Generated Types: Manual TypeScript domain interfaces were defined for the GraphQL queries instead of setting up complex automated schema code-generation pipelines.
+- Lightweight Architecture: Kept dependencies focused on GraphQL client, TanStack Query, and Tailwind CSS without adding heavy UI component libraries.
+- Testing Scope: Implemented a focused Vitest suite covering core UI logic, dynamic class styling, and pagination.
+
 ## Getting Started
 
 1. Clone the repository:
