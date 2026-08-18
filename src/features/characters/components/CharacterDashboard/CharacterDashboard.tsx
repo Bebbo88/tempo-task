@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useTransition, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useCharacters } from "../hooks/useCharacters";
-import { CharacterFilters } from "./CharacterFilters";
-import { CharacterGrid } from "./CharacterGrid";
+import { useCharacters } from "../../hooks/useCharacters";
+import { CharacterFilters } from "../CharacterFilters/CharacterFilters";
+import { CharacterGrid } from "../CharacterGrid/CharacterGrid";
 import { Pagination } from "@/shared/components/ui/Pagination";
-import { CharacterStatus } from "../types/character.types";
+import { CharacterStatus } from "../../types/character.types";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 
 export function CharacterDashboard() {
@@ -103,19 +103,37 @@ export function CharacterDashboard() {
   });
 
   const characters = data?.results ?? [];
+  const totalCount = data?.info?.count ?? 0;
   const totalPages = data?.info?.pages ?? 1;
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
-          Multiverse Explorer
-        </h1>
-        <p className="text-sm text-zinc-400">
-          Browse and search Rick and Morty characters across dimensions.
-        </p>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {/* Header section */}
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-border-subtle/60">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-primary">
+              Multiverse Explorer
+            </h1>
+            {!isLoading && totalCount > 0 && (
+              <span className="font-mono text-xs text-secondary bg-surface-primary border border-border-subtle px-2 py-0.5 rounded-full">
+                {totalCount.toLocaleString()} beings
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-secondary">
+            Dimensional character registry and status index
+          </p>
+        </div>
+
+        {!isLoading && totalPages > 1 && (
+          <div className="text-xs text-muted font-mono">
+            Page {pageParam} of {totalPages}
+          </div>
+        )}
       </header>
 
+      {/* Filter bar section */}
       <section aria-label="Character Filters">
         <CharacterFilters
           name={searchInput}
@@ -125,7 +143,8 @@ export function CharacterDashboard() {
         />
       </section>
 
-      <section aria-label="Character List" className="space-y-6">
+      {/* Grid and pagination section */}
+      <section aria-label="Character List" className="space-y-8">
         <CharacterGrid
           characters={characters}
           isLoading={isLoading}

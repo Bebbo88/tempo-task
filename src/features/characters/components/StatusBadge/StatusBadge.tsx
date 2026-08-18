@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import { CharacterStatus } from "../types/character.types";
+import { CharacterStatus } from "../../types/character.types";
 
 export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: CharacterStatus;
@@ -8,9 +8,9 @@ export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> 
 
 export function StatusBadge({ status, className, ...props }: StatusBadgeProps) {
   const dotClasses = classNames("w-2 h-2 rounded-full shrink-0", {
-    "bg-emerald-500": status === "Alive",
-    "bg-rose-500": status === "Dead",
-    "bg-zinc-500": status === "unknown",
+    "bg-status-alive": status === "Alive",
+    "bg-status-dead": status === "Dead",
+    "bg-status-unknown": status === "unknown",
   });
 
   return (
@@ -18,7 +18,7 @@ export function StatusBadge({ status, className, ...props }: StatusBadgeProps) {
       role="status"
       aria-label={`Status: ${status}`}
       className={classNames(
-        "inline-flex items-center gap-1.5 bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-0.5 rounded-full text-xs font-medium text-zinc-300",
+        "inline-flex items-center gap-1.5 bg-surface-secondary/80 border border-border-subtle px-2.5 py-0.5 rounded-full text-xs font-medium text-secondary",
         className
       )}
       {...props}

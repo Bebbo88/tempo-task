@@ -3,11 +3,35 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchCharacterById } from "@/features/characters/services/characters.api";
-import { StatusBadge } from "@/features/characters/components/StatusBadge";
+import {
+  fetchCharacterById,
+  fetchCharacters,
+} from "@/features/characters/services/characters.api";
+import { StatusBadge } from "@/features/characters/components/StatusBadge/StatusBadge";
+import { EpisodeList } from "@/features/characters/components/EpisodeList/EpisodeList";
 
 interface CharacterPageProps {
   params: Promise<{ id: string }>;
+}
+
+// ISR configuration: Revalidate static pages every 24 hours in the background
+export const revalidate = 86400;
+
+// Enable on-demand static generation for IDs not pre-rendered during build
+export const dynamicParams = true;
+
+/**
+ * SSG: Pre-generate static paths at build time for the most frequently accessed characters
+ */
+export async function generateStaticParams() {
+  try {
+    const data = await fetchCharacters({ page: 1 });
+    return (data.results || []).map((character) => ({
+      id: character.id.toString(),
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -60,97 +84,66 @@ export default async function CharacterDetailsPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div className="min-h-screen bg-background text-primary">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
         <div>
           <Link
             href="/"
-            className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors inline-flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-zinc-600 rounded px-1 -ml-1"
+            className="text-xs text-secondary hover:text-primary transition-colors inline-flex items-center gap-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-border-subtle rounded px-1 -ml-1"
           >
             <span aria-hidden="true">&larr;</span>
             <span>Back to Characters</span>
           </Link>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden flex flex-col md:flex-row">
-          <div className="relative aspect-square w-full md:w-80 bg-zinc-950 shrink-0">
+        <div className="bg-surface-primary/60 border border-border-subtle rounded-xl overflow-hidden flex flex-col md:flex-row shadow-sm">
+          <div className="relative aspect-square w-full md:w-80 bg-background shrink-0">
             <Image
               src={character.image}
               alt={character.name}
               fill
               priority
+              loading="eager"
+              unoptimized
               sizes="(max-width: 768px) 100vw, 320px"
               className="object-cover"
             />
+            {/* Subtle bottom gradient vignette */}
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-surface-primary/80 to-transparent pointer-events-none md:hidden" />
           </div>
 
           <div className="p-6 sm:p-8 flex flex-col justify-between space-y-6 flex-1">
             <div className="space-y-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+                <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-primary">
                   {character.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                <div className="flex flex-wrap items-center gap-2 mt-2">
                   <StatusBadge status={character.status} />
-                  <span className="text-sm text-zinc-400">{character.species}</span>
+                  <span className="text-xs text-secondary">{character.species}</span>
                   {character.gender && (
-                    <span className="text-sm text-zinc-500">&bull; {character.gender}</span>
+                    <span className="text-xs text-muted">&bull; {character.gender}</span>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-zinc-800 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border-subtle text-sm">
                 <div className="space-y-0.5">
-                  <span className="text-zinc-500 text-xs block">Origin</span>
-                  <span className="text-zinc-200 font-medium block">
+                  <span className="text-[11px] text-muted block">Origin</span>
+                  <span className="text-xs text-secondary font-medium block">
                     {character.origin?.name || "Unknown"}
                   </span>
                 </div>
                 <div className="space-y-0.5">
-                  <span className="text-zinc-500 text-xs block">Last Known Location</span>
-                  <span className="text-zinc-200 font-medium block">
+                  <span className="text-[11px] text-muted block">Last Known Location</span>
+                  <span className="text-xs text-secondary font-medium block">
                     {character.location?.name || "Unknown"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {character.episode && character.episode.length > 0 && (
-              <div className="space-y-3 pt-4 border-t border-zinc-800">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">
-                    Featured Episodes
-                  </h2>
-                  <span className="text-xs text-zinc-500">
-                    {character.episode.length} {character.episode.length === 1 ? "episode" : "episodes"}
-                  </span>
-                </div>
-
-                <div
-                  tabIndex={0}
-                  aria-label="Episodes list"
-                  className="max-h-52 overflow-y-auto space-y-2 pr-1.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-950 focus:outline-none focus:ring-1 focus:ring-zinc-800 rounded"
-                >
-                  {character.episode.map((ep) => (
-                    <div
-                      key={ep.id}
-                      className="bg-zinc-950/80 border border-zinc-800/80 rounded-lg p-3 flex items-start justify-between gap-3 hover:border-zinc-700/80 transition-colors"
-                    >
-                      <div className="space-y-0.5 min-w-0 flex-1">
-                        <p className="text-sm font-medium text-zinc-200 truncate">
-                          {ep.name}
-                        </p>
-                        <p className="text-xs text-zinc-500">{ep.air_date}</p>
-                      </div>
-
-                      <span className="font-mono text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/50 shrink-0">
-                        {ep.episode}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <EpisodeList episodes={character.episode} />
           </div>
         </div>
       </main>

@@ -36,21 +36,21 @@ export function Pagination({
         type="button"
         disabled={isFirstPage || isLoading}
         onClick={handlePrev}
-        className="px-3 py-1.5 text-sm bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-200 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 transition-colors"
+        className="px-3 py-1.5 text-sm bg-surface-primary border border-border-subtle rounded-lg text-primary hover:bg-surface-secondary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-primary transition-colors"
       >
         Previous
       </button>
 
-      <span className="text-sm text-zinc-400">
-        Page <span className="font-medium text-zinc-200">{currentPage}</span> of{" "}
-        <span className="font-medium text-zinc-200">{Math.max(1, totalPages)}</span>
+      <span className="text-sm text-secondary">
+        Page <span className="font-medium text-primary">{currentPage}</span> of{" "}
+        <span className="font-medium text-primary">{Math.max(1, totalPages)}</span>
       </span>
 
       <button
         type="button"
         disabled={isLastPage || isLoading}
         onClick={handleNext}
-        className="px-3 py-1.5 text-sm bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-200 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 transition-colors"
+        className="px-3 py-1.5 text-sm bg-surface-primary border border-border-subtle rounded-lg text-primary hover:bg-surface-secondary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-primary transition-colors"
       >
         Next
       </button>

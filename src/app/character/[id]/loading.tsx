@@ -1,3 +1,5 @@
+import { CharacterDetailsSkeleton } from "@/features/characters/components/CharacterDetails/CharacterDetailsSkeleton";
+
 export default function Loading() {
-  return <div className="p-8">Loading character...</div>;
+  return <CharacterDetailsSkeleton />;
 }
